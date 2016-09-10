@@ -1,0 +1,109 @@
+/**
+ * Created by aji on 15/7/13.
+ */
+define([
+    'require',
+    'marionette',
+    'underscore',
+    'jquery',
+    'backbone',
+    'datacenter',
+    'config',
+    'ViewpointView',
+    'ViewmapView',
+    'text!templates/app.tpl'
+], function(require, Mn, _, $, Backbone, Datacenter, Config, ViewpointView, ViewmapView,
+            Tpl) {
+    'use strict';
+
+    return Mn.LayoutView.extend({
+
+        tagName: 'div',
+
+        template: _.template(Tpl),
+
+        attributes:{
+            'style' : 'width: 100%; height:100%;'
+        },
+        regions:{
+            'vpBefore': '#left',
+            'vpAfter': '#right',
+        },
+
+        initialize: function (options) {
+            var self = this;
+            options = options || {};
+            this.layout = {
+                globalHeight: null,
+                globalWidth: null,
+                globalTop: null,
+                globalMargin: null,
+                leftWidthRatio: 0.47,
+                rightWidthRatio: 0.47,
+                marginRatio: 0.02,
+                heightRatio: 0.98,
+                marginBottomRatio: 0.02,
+                left:{
+                },
+                right:{
+                },
+            };
+        },
+
+        showChildViews: function(){
+            var self = this;
+            self.showChildView('vpBefore', new ViewpointView({state: 'before', layout:this.layout.left}));
+            self.showChildView('vpAfter', new ViewpointView({state: 'after', layout:this.layout.right}));
+            console.log("LayoutView: child views ready!");
+        },
+
+        onShow: function(){
+            var self = this;
+            $(document).ready(function(){
+                console.log('LayoutView: document ready!');
+                self.getLayoutParameters();
+                self.showChildViews();
+                Datacenter.start();
+            });
+        },
+
+        getLayoutParameters: function(){
+            var self = this, t_ly = this.layout;
+            var t_navTop = parseFloat($("#Navbar").css("height")) + parseFloat($("#Navbar").css("margin-bottom"));
+            Config.set("globalHeight", innerHeight);
+            t_ly.globalHeight = innerHeight;
+            Config.set("globalWidth", innerWidth);
+            t_ly.globalWidth = innerWidth;
+            Config.set("globalTop", t_navTop);
+            t_ly.globalTop = t_navTop;
+            t_ly.globalMargin = t_ly.globalWidth * t_ly.marginRatio;
+            var t_height = (t_ly.globalHeight - t_ly.globalTop) * t_ly.heightRatio;
+            //Left View
+            var t_leftWidth = t_ly.globalWidth * t_ly.leftWidthRatio;
+            t_ly.left = {
+                top: t_ly.globalTop,
+                left: t_ly.globalMargin,
+                width: t_leftWidth,
+                height: t_height,
+                };
+            this.updateView("#left",t_ly.left);
+            //Right View
+            var t_rightWidth = t_ly.globalWidth * t_ly.rightWidthRatio;
+            t_ly.right = {
+                top: t_ly.globalTop,
+                left: t_leftWidth + t_ly.globalMargin * 2,
+                width: t_rightWidth,
+                height: t_height,
+            };
+            this.updateView("#right",t_ly.right);
+        },
+
+        updateView: function(v_region, v_layout){
+            $(v_region)
+            .css("top",v_layout.top)
+            .css("left",v_layout.left)
+            .css("width",v_layout.width)
+            .css("height",v_layout.height);
+        },
+    });
+});

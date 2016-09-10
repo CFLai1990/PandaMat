@@ -1,0 +1,26 @@
+{
+  "name": "ViewpointChanger",
+  "homepage": "",
+  "authors": [
+    "ChufanLai"
+  ],
+  "description": "test",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "backbone": "^1.2.3",
+    "backbone-localstorage": "^0.3.2",
+    "backbone-relational": "^0.10.0",
+    "backbone.marionette": "^2.4.4",
+    "bootstrap": "^3.3.5",
+    "d3": "^3.5.9",
+    "jquery": "^2.1.4",
+    "underscore": "^1.8.3",
+    "less": "~2.5.3",
+    "requirejs": "~2.1.22",
+    "text": "requirejs-text#~2.0.14",
+    "numericjs": "~1.2.6"
+  }
+}
