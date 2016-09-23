@@ -16,11 +16,44 @@
     <Filter Include="..">
       <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="..">
-      <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
     </Filter>
     <Filter Include="..">
       <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..">
+      <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..">
+      <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..">
+      <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..">
+      <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..">
+      <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\operations">
+      <UniqueIdentifier>{C33E564A-C94D-32D4-DAF5-CA040F2BE6ED}</UniqueIdentifier>
     </Filter>
     <Filter Include="C:">
       <UniqueIdentifier>{7B735499-E5DD-1C2B-6C26-70023832A1CF}</UniqueIdentifier>
@@ -60,20 +93,32 @@
     <ClCompile Include="..\pandamat.cc">
       <Filter>..</Filter>
     </ClCompile>
+    <ClCompile Include="..\pandapool.cc">
+      <Filter>..</Filter>
+    </ClCompile>
     <ClCompile Include="..\opercollection.cc">
       <Filter>..</Filter>
     </ClCompile>
-    <ClCompile Include="..\operation.cc">
-      <Filter>..</Filter>
+    <ClCompile Include="..\operations\operationdata.cc">
+      <Filter>..\operations</Filter>
     </ClCompile>
-    <ClCompile Include="..\add.cc">
-      <Filter>..</Filter>
+    <ClCompile Include="..\operations\operation.cc">
+      <Filter>..\operations</Filter>
     </ClCompile>
-    <ClCompile Include="..\dot.cc">
-      <Filter>..</Filter>
+    <ClCompile Include="..\operations\add.cc">
+      <Filter>..\operations</Filter>
     </ClCompile>
-    <ClCompile Include="..\transpose.cc">
-      <Filter>..</Filter>
+    <ClCompile Include="..\operations\dot.cc">
+      <Filter>..\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\operations\transpose.cc">
+      <Filter>..\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\operations\normalize.cc">
+      <Filter>..\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\operations\sqrtdist.cc">
+      <Filter>..\operations</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\Chufan.Lai\AppData\Roaming\npm\node_modules\node-gyp\src\win_delay_load_hook.cc">
       <Filter>C:\Users\Chufan.Lai\AppData\Roaming\npm\node_modules\node-gyp\src</Filter>

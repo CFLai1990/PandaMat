@@ -4,11 +4,15 @@ var operators = {
 	// '-': {name: 'minus', priority: 1, parameter: [-1,1]},
 	'\'': {name: 'trans', priority: 100, parameter: [-1]},
 	'*': {name: 'dot', priority: 10, parameter: [-1,1]},
+	'=': {name: 'equal', priority: 0, parameter: [-1,1]},
 }, methods = {
 	//注意函数名不能从后面起成子序列，譬如"substring"和"string"
 	//一个有效的方法是将所有函数名首字母大写
 	// 'Max': 'max',
 	// 'Two': 'two',
+	'Add': 'add',
+	'Normalize': 'normalize',
+	'Dist': 'sqrtDist',
 }, failResult = {}, tempPrefix = "$PTemp_", tempCount = 0,
 Perror = {
 	grammar: "Grammar error!",
@@ -57,6 +61,12 @@ function init(){
 		}
 	};
 
+	function remove(v_variable){
+		if(this.variables.has(v_variable)){
+			this.variables.splice(this.variables.indexOf(v_variable), 1);
+		}
+	}
+
 	function data(v_data){
 		for(var i in v_data){
 			this.record(i);
@@ -73,11 +83,12 @@ function init(){
 		}
 	};
 
-	function getResult(v_command, v_variables){
+	function getResult(v_command, v_return){
+		var t_result, t_commands;
 		try{
-			var t_commands = this.parse(v_command.replace(" ", ""), true);
+			t_commands = this.parse(v_command.replace(/ /g, ""), true);
 			this.commands = t_commands.result;
-			var t_result = this.operate(this.commands);
+			t_result = this.operate(this.commands);
 			if(test){
 				return {
 					state: true,
@@ -85,14 +96,36 @@ function init(){
 					result: test_data[t_result],
 				};
 			}else{
-				return this.panda.get(t_result);
+				var t_pResult;
+				if(v_return){
+					t_pResult = this.panda.get(t_result);
+				}else{
+					t_pResult = {
+						state: true,
+						message: "Success!",
+						result: [],
+					};
+				}
+				this.clear();
+				if(t_pResult.state){
+					t_pResult.variables = this.variables;
+				}else{
+					if(t_result){
+						this.remove(t_result);
+					}
+				}
+				return t_pResult;
 			}
 		}catch(err){
-			return {
+			var t_pResult = {
 				state: false,
 				message: err,
 				result: [],
 			};
+			if(t_result){
+				this.remove(t_result);
+			}
+			return t_pResult;
 		}
 	};
 
@@ -247,6 +280,11 @@ function init(){
 					t_commands.push(t_short);
 					t_short = "";
 				}
+				if(t_char == "="){
+					if(t_commands.length != 1){
+						throw Perror.grammar;
+					}
+				}
 				t_commands.push(t_opr.name);
 			}else{
 				switch(t_char){
@@ -260,6 +298,7 @@ function init(){
 								throw Perror.method;
 							}
 							t_functions.push(t_func);
+							t_short = "";
 						}
 					break;
 					case ")":
@@ -328,7 +367,7 @@ function init(){
 
 	function pandaCompute(v_command, v_parameters){
 		//直接连接PandaMat，输出变量名
-		// console.log("       Unit: ", v_command, v_parameters);
+		// console.log(v_command, v_parameters);
 		var t_variable_name = tempPrefix + tempCount;
 		if(test){
 			var t_data = [], t_result, t_length = v_parameters.length;
@@ -359,14 +398,48 @@ function init(){
 			test_data[t_variable_name] = t_result;
 			tempCount ++;
 		}else{
-			var t_result = this.panda.operate(v_command, v_parameters, t_variable_name);
+			var t_result = this.panda.operate(v_command, v_parameters, t_variable_name, false);
 			if(t_result.state){
+				if(v_command == "equal"){
+					t_variable_name = v_parameters[0];
+				}
 				tempCount ++;
 			}else{
 				throw t_result.message;
 			}
 		}
 		return t_variable_name;
+	};
+
+	function check(v_variable){
+		var t_state = this.variables.has(v_variable);
+		if(t_state){
+			return {
+				state: true,
+				message: "Success!",
+				result: [],
+			};
+		}else{
+			return {
+				state: false,
+				message: "Variable not found!",
+				result: [],
+			};
+		}
+	};
+
+	function clear(){
+		var t_origin = this.variables, t_variables = [], t_remove = [];
+		for(var i = 0; i < t_origin.length; i++){
+			if(!t_origin[i].has(tempPrefix)){
+				t_variables.push(t_origin[i]);
+			}else{
+				t_remove.push(t_origin[i]);
+			}
+		}
+		this.panda.remove(t_remove);
+		tempCount = 0;
+		this.variables = t_variables;
 	};
 
 	panda_js = {
@@ -376,10 +449,13 @@ function init(){
 		operate: operate,
 		operateUnit: operateUnit,
 		parse: parse,
-		variables: [],
-		commands: [],
+		check: check,
+		remove: remove,
+		clear: clear,
 		compute: pandaCompute,
 		record: record,
+		variables: [],
+		commands: [],
 	};
 	return panda_js;
 }

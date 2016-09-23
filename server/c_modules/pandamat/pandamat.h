@@ -1,16 +1,22 @@
 #ifndef PANDAMAT_H
 #define PANDAMAT_H
+#define ARMA_DONT_USE_WRAPPER
 #include <iostream>  
+#include <sstream>
 #include <stdlib.h>
+#include <cmath>
+#include <stdio.h>
 #include <map>
 #include <string>
 #include <node.h>
 #include <node_object_wrap.h>
 #include <v8.h>
 #include <armadillo>
+#include "pbasics.h"
 #include "operation.h"
 #include "opercollection.h"
-  
+#include "pandapool.h"
+
 using namespace std;
 using namespace node;
 using namespace v8;
@@ -23,24 +29,26 @@ public:
 	static void NewInstance(const FunctionCallbackInfo<Value>& args);
   	static Persistent<Function> constructor;
 protected:
-	void Prepare(Isolate* v_isolate);
-	void unpackArray(Local<Value> v_arr, parameterType& v_type, mat& v_data);
-	void packArray(mat& v_data);
-	Operation* getOperation(const char* v_command);
-	bool getState();
-	mat getResult(Operation* v_opr);
-	Local<Object> packResult(mat& v_data);
+	unsigned int enter(Isolate* v_isolate);
+	void exit(unsigned int v_id);
+	void setState(unsigned int v_id, exceptions v_code, string v_message);
+	void save(unsigned int v_id, Local<Value> v_data, const char* v_name);
+	void saveResult(unsigned int v_id, const char * v_to, const char * v_from);
+	void saveResult(unsigned int v_id, const char * v_name);
+	void check(unsigned int v_id, const char* v_name);
+	void get(unsigned int v_id, const char* v_name);
+	void remove(unsigned int v_id, const char* v_name);
+	void send(unsigned int v_id, Operation* v_opr, const char* v_name, unsigned int v_i);
+	void getResult(unsigned int v_id, Operation* v_opr);
+	Operation* getOperation(unsigned int v_id, const char* v_command);
+	Local<Object> packResult(unsigned int v_id, bool v_result);
 private:
 	static void New(const FunctionCallbackInfo<Value>& args);
-	static void saveData(const FunctionCallbackInfo<Value>& args);
-	static void getData(const FunctionCallbackInfo<Value>& args);
 	static void Operate(const FunctionCallbackInfo<Value>& args);
+	static void saveData(const FunctionCallbackInfo<Value>& args);
+	static void removeData(const FunctionCallbackInfo<Value>& args);
+	static void getData(const FunctionCallbackInfo<Value>& args);
 	OperationCollection operations;
-	map<string, mat> data;
-	Isolate* isolate;
-	map<string, int> expTypes;
-	string stateMessage;
-	exceptions stateCode;
-	Local<Array> resultMat;
+	PandaPool pool;
 };
 #endif

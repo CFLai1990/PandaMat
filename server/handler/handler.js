@@ -20,7 +20,7 @@ var fileType = {
 	"pdf":"application/pdf",
 };
 
-function initialize(root, db, computation, logger){
+function initialize(root, db, logger){
 	var resOpt = {
 		root:  root
 	};
@@ -100,34 +100,40 @@ function initialize(root, db, computation, logger){
 		}
 	}
 
-	function handleMatirxOperations(request, response){
-		var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
-		logger.log("    Handler: PandaMat from " + ip + " !");
-		var t_parameters = JSON.parse(decodeURI(request.url.replace("/pandamat?", "")));
-		response.set("Access-Control-Allow-Origin","*");
-		response.set("Access-Control-Allow-Methods","GET");
-		var responseFunc = function(v_result){
-			if(!v_result){
-				logger.log("    Handler: PandaMat Failed!");
-				response.sendStatus(404);
-			}else{
-				if(v_result.state){
-					logger.log("    Handler: PandaMat Success!");
-				}else{
-					logger.log("    Handler: PandaMat Failed!");
-				}
-				response.status(200).jsonp(v_result);
-			}
-		};
-		computation.handle(t_parameters, responseFunc);
-	}
+	// function handleMatirxOperations(request, response){
+	// 	var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+	// 	logger.log("    Handler: PandaMat from " + ip + " !");
+	// 	var t_parameters;
+	// 	for(var i in request.body){
+	// 		console.log(i.length);
+	// 		if(!t_parameters){
+	// 			t_parameters = JSON.parse(i);
+	// 		}
+	// 	}
+	// 	response.set("Access-Control-Allow-Origin","*");
+	// 	response.set("Access-Control-Allow-Methods","GET, POST");
+	// 	var responseFunc = function(v_result){
+	// 		if(!v_result){
+	// 			logger.log("    Handler: PandaMat Failed!");
+	// 			response.sendStatus(404);
+	// 		}else{
+	// 			if(v_result.state){
+	// 				logger.log("    Handler: PandaMat Success!");
+	// 			}else{
+	// 				logger.log("    Handler: PandaMat Failed!");
+	// 			}
+	// 			response.status(200).jsonp(v_result);
+	// 		}
+	// 	};
+	// 	computation.handle(t_parameters, responseFunc);
+	// }
 
 	var handle = {};
 	handle["/"] = handleStart;
 	handle["/start"] = handleStart;
 	handle["upload"] = handleUpload;
 	handle["query"] = handleQuery;
-	handle["pandamat"] = handleMatirxOperations;
+	// handle["pandamat"] = handlePanda;
 	handle["file"] = handleFile;
 	handle["404"] = handle404;
 	return handle;

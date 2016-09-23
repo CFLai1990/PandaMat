@@ -1,12 +1,11 @@
 //Manager: 路由相当于处理程序的管理者，决定调用哪个程序来响应特定需求
 var express = require("express");
 var url = require("url");
-var bodyParser = require('body-parser');
 var router = express.Router();
 var logger;
 // var c = require("../c_modules/c_loader.js"), PandaMat = c.require("pandamat");
 
-function useHandle(func, queryFunc, matFunc){
+function useHandle(func, queryFunc){
 	return function(request, response, next){
 	    var pathname = url.parse(request.url).pathname;
 		if(request.method!="GET"){
@@ -19,7 +18,8 @@ function useHandle(func, queryFunc, matFunc){
 				queryFunc(request, response);
 			break;
 			case "/pandamat":
-				matFunc(request, response);
+				next();
+				return;
 			break;
 			default:
 				func(pathname, response, next);
@@ -30,14 +30,19 @@ function useHandle(func, queryFunc, matFunc){
 
 function initialize(handle, v_logger){
 	logger = v_logger;
-	router.use(useHandle(handle['file'], handle["query"], handle["pandamat"]));
+	router.use(useHandle(handle['file'], handle["query"]));
 	for(var t_path in handle){
 		if(typeof handle[t_path]==='function'){
 			if(t_path.indexOf('/')>=0){
-				router.get(t_path, useHandle(handle[t_path], handle['query'], handle["pandamat"]));
+				router.get(t_path, useHandle(handle[t_path], handle['query']));
 			}
 		}
 	}
+	// router.compute = 
+	// function(req, res){
+	// 	logger.log("  Router: About to route a request from "+ req.originalUrl);
+	// 	handle["pandamat"](req, res);
+	// };
 	return router;
 }
 

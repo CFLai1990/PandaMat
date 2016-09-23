@@ -41,15 +41,24 @@
                 });
             },
 
-            panda: function(v_data, v_command, v_callback){
-                console.time("PandaMat: ");
-                PandaMat.get({
-                    data: v_data,
-                    command: v_command,
-                }, function(v_result){
-                    console.timeEnd("PandaMat: ");
-                    v_callback(v_result);
-                });
-            },          
+            panda: function(v_data, v_command, v_glb, v_return, v_callback){
+                    console.time("PandaMat");
+                    PandaMat.compute({
+                        panda: {
+                            data: v_data,
+                            command: v_command,
+                            global: v_glb,
+                            return: v_return,
+                        },
+                        sucess: function(v_result){
+                            console.timeEnd("PandaMat");
+                            v_callback(v_result);
+                        },
+                        error: function(v_message){
+                            console.timeEnd("PandaMat");
+                            console.error(v_message);
+                        },
+                    });
+            },   
     }))();
 });
