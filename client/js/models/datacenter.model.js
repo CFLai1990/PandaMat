@@ -41,24 +41,25 @@
                 });
             },
 
-            panda: function(v_data, v_command, v_glb, v_return, v_callback){
-                    console.time("PandaMat");
-                    PandaMat.compute({
-                        panda: {
-                            data: v_data,
-                            command: v_command,
-                            global: v_glb,
-                            return: v_return,
-                        },
-                        sucess: function(v_result){
-                            console.timeEnd("PandaMat");
-                            v_callback(v_result);
-                        },
-                        error: function(v_message){
-                            console.timeEnd("PandaMat");
-                            console.error(v_message);
-                        },
-                    });
-            },   
+            panda: function(v_data, v_command, v_callback, v_glb = true, v_return = false){
+                let t_command = v_command;
+                console.time(`PandaMat ${v_command}`);
+                PandaMat.compute({
+                    panda: {
+                        data: v_data,
+                        command: v_command,
+                        global: v_glb,
+                        return: v_return,
+                    },
+                    sucess: function(v_result){
+                        console.timeEnd(`PandaMat ${v_command}`);
+                        v_callback(v_result);
+                    },
+                    error: function(v_message){
+                        console.timeEnd(`PandaMat ${v_command}`);
+                        console.error(v_message);
+                    },
+                });
+            }, 
     }))();
 });

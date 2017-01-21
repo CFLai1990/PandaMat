@@ -1,16 +1,17 @@
 function initialize(){
 	var fs = require('fs');
-	var logger = require("tracer").console();
-	/*{
-		transport : function(data) {
-			console.log(data.output);
-			var stream = fs.createWriteStream("./stream.log", {
-				flags: "a",
-				encoding: "utf8",
-				mode: 0666
-			}).write(data.output+"\n");
-		}
-	}*/
+	var colors = require('colors');
+	var logger = require("tracer").colorConsole({
+	    filters : [
+	               {            
+	               	trace : colors.magenta,
+		            debug : colors.blue,
+		            info : colors.green,
+		            warn : colors.yellow,
+		            error : [ colors.red, colors.bold ]
+	               }
+	    ]
+	});
 	return logger;
 }
 

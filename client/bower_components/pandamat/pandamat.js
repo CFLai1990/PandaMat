@@ -1,14 +1,25 @@
 define([
-	"./jquery",
+	"jquery",
 	], function($){
 		"use strict";
 
-		var PandaMat = (typeof exports === "undefined")?(function pandamat() {}):(exports);
+		let PandaMat = (typeof exports === "undefined")?(function pandamat() {}):(exports);
 		if(typeof global !== "undefined") { global.PandaMat = PandaMat; }
 
+		window.onbeforeunload = function(){
+			if(PandaMat.stream){
+				close();
+			}
+		};
+
 		PandaMat.version = "1.0.0";
-		var serverAddress = 'ws://192.168.10.9:2046', connectionWait = 10000, poolPrefix = "PPool_",
-		connectCheckInterval = 5;
+		let serverAddress = 'ws://vis.pku.edu.cn/PandaMat/Server/', connectionWait = 10000, poolPrefix = "PPool_",
+		connectCheckInterval = 5, ipAddress;
+		//let ipdf = $.Deferred();
+		// $.get("http://ipinfo.io", function(response) {
+		//     ipAddress = response.ip;
+		//     ipdf.resolve();
+		// }, "jsonp");
 
 		function replace(v_origin, v_replace){
 			if(v_origin){
@@ -31,11 +42,15 @@ define([
 		};
 
 		function strOpen(v_callback, v_glb){
-			var t_stream = new WebSocket(serverAddress);
+			let t_stream = new WebSocket(serverAddress);
             t_stream.onopen = function(e){
             	if(v_callback){
 	            	v_callback(true);
             	}
+            	// $.when(ipdf)
+            	// .done(function(){
+	            // 	strSend(t_stream, {state: "address", data: ipAddress});
+            	// });
             };
             t_stream.onclose = function(e){
             	if(!this.used){
@@ -59,7 +74,7 @@ define([
 		};
 
 		function strSend(v_stream, v_message){
-			var t_message;
+			let t_message;
 			if(typeof(v_message) == "string"){
 				t_message = v_message;
 			}else{
@@ -75,7 +90,7 @@ define([
 				if(!e.data){
 					errorGLB();
 				}
-				var t_d = JSON.parse(e.data).data;
+				let t_d = JSON.parse(e.data).data;
 				if(v_callback){
 					v_callback(t_d.result, t_d.state, t_d.message, t_d.variables, t_d.id);
 				}else{
@@ -94,11 +109,11 @@ define([
 	            	v_callback(true);
             	}
 			};
-			strSend(v_stream, {state: "cloase"});
+			strSend(v_stream, {state: "close"});
 		};
 
 		function open(v_callback){
-			var t_stream = PandaMat.stream;
+			let t_stream = PandaMat.stream;
 			if(!t_stream){
 				PandaMat.stream = t_stream = strOpen(v_callback, true);
 				t_stream.used = true;
@@ -114,7 +129,7 @@ define([
 		};
 
 		function close(v_callback){
-			var t_stream = PandaMat.stream;
+			let t_stream = PandaMat.stream;
 			if(t_stream){
 				clearAll();
 				strClose(t_stream, v_callback);
@@ -126,10 +141,16 @@ define([
 		};
 
 		function compute(v_params){
-			var t_panda = v_params.panda,
+			let t_panda = v_params.panda,
 			t_success = replace(v_params.sucess, sucessGLB),
 			t_error = replace(v_params.error, errorGLB);
-			var t_stream;
+			if(!('global' in t_panda)){
+				t_panda['global'] = true;
+			}
+			if(!('return' in t_panda)){
+				t_panda['return'] = false;
+			}
+			let t_stream;
 			if(t_panda.global){
 				if(PandaMat.stream){
 					t_stream = PandaMat.stream;
@@ -149,7 +170,7 @@ define([
 		};
 
 		function computeOneTime(v_panda, v_success, v_error){
-			var t_stream = strOpen(function(vv_state){
+			let t_stream = strOpen(function(vv_state){
 				if(vv_state){
 					get(t_stream, v_panda, function(v_result){
 						v_success(v_result);
@@ -167,70 +188,73 @@ define([
             strMessage(v_stream, function(vv_result, vv_sucess, 
             	vv_message, vv_variable, vv_id){
         		v_stream.used = true;
+        		// console.log(vv_sucess, vv_message, vv_id);
         		if(vv_sucess){
         			if(vv_id && vv_variable){
-        				PandaMat.variables = vv_variable;
+        				PandaMat.variables = new Set(vv_variable);
         			}
-        			if(v_success){
-	        			v_success(vv_result);
-        			}else{
-        				if(vv_id){
-        					callback(vv_id, vv_result, true);
-        				}
-        			}
+    				if(vv_id){
+    					callback(vv_id, vv_result, true);
+    				}else{
+    					if(v_success){
+	    					v_success(vv_result);
+    					}else{
+    						sucessGLB(vv_result);
+    					}
+    				}
         		}else{
-        			if(v_error){
-	                	v_error(vv_message);
-        			}else{
-        				if(vv_id){
-        					callback(vv_id, vv_result, false);
-        				}else{
-        					errorGLB(vv_message);
-        				}
-        			}
+    				if(vv_id){
+    					callback(vv_id, vv_message, false);
+    				}else{
+    					if(v_error){
+	    					v_error(vv_message);
+    					}else{
+    						errorGLB(vv_message);
+    					}
+    				}
                 }
             });
 		};
 
 		function cache(v_panda, v_success, v_error){
-			var t_id = poolPrefix + PandaMat.pandaCount;
-			PandaMat.pandaPool[t_id] = {
+			let t_id = poolPrefix + PandaMat.pandaCount;
+			PandaMat.pandaPool.set(t_id, {
 				sucess: v_success,
 				error: v_error,
-			};
+			});
 			v_panda.id = t_id;
 			PandaMat.pandaCount ++;
 			return v_panda;
 		};
 
 		function callback(v_id, v_result, v_state){
-			var t_callback = PandaMat.pandaPool[v_id];
+			let t_callback = PandaMat.pandaPool.get(v_id);
 			if(v_state){
 				t_callback.sucess(v_result);
 			}else{
-				t_callback.error(v_callback);
+				t_callback.error(v_result);
 			}
-			delete PandaMat.pandaPool[v_id];
+			PandaMat.pandaPool.delete(v_id);
 		};
 
 		function has(v_variable){
 			if(!PandaMat.stream || !v_variable){
 				return false;
 			}else{
-				return (PandaMat.variables.indexOf(v_variable)>=0);
+				return PandaMat.variables.has(v_variable);
 			}
 		};
 
 		function clearAll(){
 			PandaMat.stream = null;
-			PandaMat.variables = [];
-			PandaMat.pandaPool = {};
+			PandaMat.variables.clear();
+			PandaMat.pandaPool.clear();
 			PandaMat.pandaCount = 0;
 		};
 
 		PandaMat.stream = null;
-		PandaMat.variables = [];
-		PandaMat.pandaPool = {};
+		PandaMat.variables = new Set();
+		PandaMat.pandaPool = new Map();
 		PandaMat.pandaCount = 0;
 
 		PandaMat.has = has;

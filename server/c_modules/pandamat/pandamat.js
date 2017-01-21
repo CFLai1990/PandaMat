@@ -11,8 +11,27 @@ var operators = {
 	// 'Max': 'max',
 	// 'Two': 'two',
 	'Add': 'add',
+	'Trans': 'trans',
+	'Dot': 'dot',
+	'Multiply': 'multiply',
+	'Equal': 'equal',
 	'Normalize': 'normalize',
 	'Dist': 'sqrtDist',
+	'Coord': 'coordinate',
+	'Coordws': 'coordinatews',
+	'CoordsTransform': 'coordstransform',
+	'Getcoord': 'getcoordinates',
+	'Projection': 'projection',
+	'Mds': 'mds',
+	'Kmeans': 'kmeans',
+	'Subspace': 'subspace',
+	'Subsampling': 'subsampling',
+	'DimDistance': 'dimDistance',
+	'KNNGraphs': 'KNNGraphs',
+	'KNNGraph': 'KNNGraph',
+	'KNNGDistance': 'KNNGDistance',
+	'KNNGModel': 'KNNGModel',
+	'KNNGOperate': 'KNNGOperate',
 }, failResult = {}, tempPrefix = "$PTemp_", tempCount = 0,
 Perror = {
 	grammar: "Grammar error!",
@@ -52,7 +71,7 @@ Array.prototype.empty = function(){
 	return !(this.length > 0);
 }
 
-function init(){
+function init(v_pID){
 	var panda_js = {};
 
 	function record(v_variable){
@@ -186,8 +205,10 @@ function init(){
 							continue;
 						}else{
 							var tt_variable = this.operate([tt_commands[t_i]]);
-							this.record(tt_variable);
-							tt_commands[t_i] = tt_variable;
+							if(tt_variable != "null"){
+								this.record(tt_variable);
+								tt_commands[t_i] = tt_variable;
+							}
 						}
 					}
 					t_commands.push(tt_commands.join(","));
@@ -211,6 +232,7 @@ function init(){
 						}
 					}
 					if(!t_found){
+						console.log(tt_name);
 						throw Perror.method;
 					}
 					this.record(ttt_variable);
@@ -232,6 +254,7 @@ function init(){
 							}
 						}
 						if(!t_found){
+							console.log(tt_name);
 							throw Perror.method;
 						}
 						this.record(ttt_variable);
@@ -344,7 +367,7 @@ function init(){
 				}
 				t_par[i] = t_commands[tt_ind];
 			}
-			var t_variable = this.compute(t_opr.name, t_par);			
+			var t_variable = this.compute(t_opr.name, t_par);
 			this.record(t_variable);
 			var t_inds = t_opr.parameter.slice(0);
 			t_inds.push(0);t_inds.sort();
@@ -367,7 +390,6 @@ function init(){
 
 	function pandaCompute(v_command, v_parameters){
 		//直接连接PandaMat，输出变量名
-		// console.log(v_command, v_parameters);
 		var t_variable_name = tempPrefix + tempCount;
 		if(test){
 			var t_data = [], t_result, t_length = v_parameters.length;
@@ -442,8 +464,13 @@ function init(){
 		this.variables = t_variables;
 	};
 
+	function exit(){
+		this.panda.exit();
+	};
+
 	panda_js = {
-		panda: new PandaMat(),
+		pID: v_pID,
+		panda: new PandaMat(v_pID),
 		data: data,
 		get: getResult,
 		operate: operate,
@@ -452,6 +479,7 @@ function init(){
 		check: check,
 		remove: remove,
 		clear: clear,
+		exit: exit,
 		compute: pandaCompute,
 		record: record,
 		variables: [],

@@ -3,7 +3,40 @@
 Persistent<Function> PandaMat::constructor;
 
 PandaMat::PandaMat(){
+}
 
+PandaMat::~PandaMat(){
+}
+
+void PandaMat::registerUser(string v_pandaID){
+	pandaID = v_pandaID;
+	pandaPath = userDataPath + v_pandaID + '/';
+	path t_dirPath(pandaPath.c_str());
+	if(exists(t_dirPath)){
+		remove_all(t_dirPath);
+	}
+	create_directory(t_dirPath);
+	operations.getUserDataPath(pandaPath);
+}
+
+void PandaMat::exitUser(const FunctionCallbackInfo<Value>& args){
+	Isolate* t_isolate = args.GetIsolate();
+	PandaMat* obj = ObjectWrap::Unwrap<PandaMat>(args.Holder());
+	unsigned int t_id = obj -> enter(t_isolate);
+	try{
+		path t_dirPath(obj-> pandaPath.c_str());
+		if(exists(t_dirPath)){
+			remove_all(t_dirPath);
+		}
+		Local<Object> result = obj -> packResult(t_id, false);
+		obj -> exit(t_id);
+		args.GetReturnValue().Set(result);
+	}
+	catch(exceptions&){
+		Local<Object> result = obj -> packResult(t_id, false);
+		obj -> exit(t_id);
+		args.GetReturnValue().Set(result);
+	}
 }
 
 unsigned int PandaMat::enter(Isolate* v_isolate){
@@ -97,6 +130,9 @@ Local<Object> PandaMat::packResult(unsigned int v_id, bool v_result){
 	t_result -> Set(String::NewFromUtf8(t_isolate, "message"), String::NewFromUtf8(t_isolate, t_message.c_str()));
 	if(v_result){
 		switch(t_type){
+			case p_vector:
+				t_result -> Set(String::NewFromUtf8(t_isolate, "result"), pool.getResultVec(v_id));
+			break;
 			case p_matrix:
 				t_result -> Set(String::NewFromUtf8(t_isolate, "result"), pool.getResultMat(v_id));
 			break;
@@ -252,7 +288,9 @@ void PandaMat::New(const FunctionCallbackInfo<Value>& args){
 	Isolate* t_isolate = args.GetIsolate();
 	if (args.IsConstructCall()) {
     // Invoked as constructor: `new MyObject(...)`
+		string t_pandaID = string(*(String::Utf8Value(args[0])));
 		PandaMat* obj = new PandaMat();
+		obj-> registerUser(t_pandaID);
 		obj->Wrap(args.This());
 		args.GetReturnValue().Set(args.This());
 	} else {
@@ -277,6 +315,7 @@ void PandaMat::Init(Isolate* v_isolate){
 	NODE_SET_PROTOTYPE_METHOD(tpl, "save", saveData);
 	NODE_SET_PROTOTYPE_METHOD(tpl, "remove", removeData);
 	NODE_SET_PROTOTYPE_METHOD(tpl, "operate", Operate);
+	NODE_SET_PROTOTYPE_METHOD(tpl, "exit", exitUser);
 	constructor.Reset(v_isolate, tpl->GetFunction());
 }
 

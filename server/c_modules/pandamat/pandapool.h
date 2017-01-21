@@ -25,6 +25,7 @@ public:
 	Isolate* getIsolate(unsigned int v_id);
 	//State functions
 	void setState(unsigned int v_id, exceptions v_code, string v_message);
+	exceptions getState(unsigned int v_id);
 	bool packState(unsigned int v_id);
 	string packMessage(unsigned int v_id);
 	//Data functions
@@ -38,6 +39,7 @@ public:
 	exceptions send(unsigned int v_id, OperationData& v_oprData, parameterType v_type, const char* v_from, const char* v_to);
 	parameterType getType(Local<Value> v_data);
 	parameterType getType(unsigned int v_id);
+	Local<Array> getResultVec(unsigned int v_id);
 	Local<Array> getResultMat(unsigned int v_id);
 	Local<Number> getResultValue(unsigned int v_id);
 	Local<String> getResultString(unsigned int v_id);
@@ -47,16 +49,20 @@ private:
 	map<unsigned int, Isolate*> isolatePool;
 	map<unsigned int, exceptions> statePool;
 	map<unsigned int, string> messagePool;
+	map<unsigned int, vec> vecPool;
 	map<unsigned int, mat> matPool;
 	map<unsigned int, double> numberPool;
 	map<unsigned int, string> stringPool;
 	map<unsigned int, bool> boolPool;
 	map<unsigned int, parameterType> typePool;
+	vec getVec(unsigned int v_id);
 	mat getMat(unsigned int v_id);
 	double getValue(unsigned int v_id);
 	string getString(unsigned int v_id);
 	bool getBool(unsigned int v_id);
+	void unpackArray(unsigned int v_id, Local<Value> v_vec, vec& v_data);
 	void unpackArray(unsigned int v_id, Local<Value> v_mat, mat& v_data);
+	void packArray(unsigned int v_id, vec v_vec, Local<Array>& v_arr);
 	void packArray(unsigned int v_id, mat v_mat, Local<Array>& v_arr);
 };
 #endif

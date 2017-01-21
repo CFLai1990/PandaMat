@@ -1,0 +1,35 @@
+{
+  "name": "pandamat",
+  "version": "1.0.0",
+  "description": "An efficient node-c++ server to support front-end data computation.",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongodb": "^2.2.9",
+    "numeric": "^1.2.6",
+    "q": "^1.4.1",
+    "tracer": "^0.8.3",
+    "underscore": "^1.8.3",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-htmlmin": "^3.0.0",
+    "webpack": "^1.13.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CFLai1990/PandaMat.git"
+  },
+  "author": "chufan lai (chufan.lai@192.168.10.9)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CFLai1990/PandaMat/issues"
+  },
+  "homepage": "https://github.com/CFLai1990/PandaMat#readme"
+}
